@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MUHU 무휴 · 생2보빌</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; }
+
+    /* 카드 플립 */
+    .card-scene { perspective: 900px; }
+    .card-body {
+      transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+      transform-style: preserve-3d;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .card-body.flipped { transform: rotateY(180deg); }
+    .card-face {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      position: absolute;
+      inset: 0;
+    }
+    .card-back { transform: rotateY(180deg); }
+
+    /* 탭 버튼 */
+    .tab-btn { transition: background .2s, color .2s; border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: #60a5fa; border-bottom-color: #3b82f6; }
+
+    /* 카테고리 필터 */
+    .cat-pill { transition: background .15s, color .15s; }
+    .cat-pill.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+
+    /* 루틴 스플릿 버튼 */
+    .split-btn { transition: background .15s, color .15s; }
+    .split-btn.active { background: #1d4ed8; color: #fff; }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen select-none">
+
+  <!-- 헤더 -->
+  <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 sticky top-0 z-50">
+    <div class="max-w-xl mx-auto flex items-center justify-between">
+      <div class="flex items-baseline gap-2">
+        <span class="text-xl font-black tracking-tight text-blue-400">MUHU</span>
+        <span class="text-xs text-gray-500">無休 · 생활스포츠지도사 2급 보디빌딩</span>
+      </div>
+      <span class="text-xs text-gray-500" id="headerDate"></span>
+    </div>
+  </header>
+
+  <!-- 탭 내비게이션 -->
+  <nav class="bg-gray-900 border-b border-gray-800 sticky top-[57px] z-40">
+    <div class="max-w-xl mx-auto flex">
+      <button class="tab-btn active flex-1 py-3 text-sm font-semibold text-blue-400"
+              data-tab="hub" onclick="showTab('hub')">🏠 스터디 허브</button>
+      <button class="tab-btn flex-1 py-3 text-sm font-semibold text-gray-500"
+              data-tab="card" onclick="showTab('card')">🃏 구술 카드</button>
+      <button class="tab-btn flex-1 py-3 text-sm font-semibold text-gray-500"
+              data-tab="routine" onclick="showTab('routine')">💪 루틴 트래커</button>
+    </div>
+  </nav>
+
+  <!-- ============================== TAB C: 스터디 허브 ============================== -->
+  <div id="tab-hub" class="tab-content max-w-xl mx-auto px-4 py-5 space-y-5 pb-10">
+
+    <!-- 소등 배너 -->
+    <div class="bg-indigo-950 border border-indigo-700 rounded-2xl p-4 flex items-center gap-3">
+      <span class="text-2xl">🌙</span>
+      <div>
+        <div class="font-bold text-indigo-300 text-sm">소등 시간</div>
+        <div class="text-xs text-gray-300 mt-0.5">매일 <span class="text-white font-bold">22:00 ~ 07:00</span> — 이 시간 내 발화 금지</div>
+      </div>
+    </div>
+
+    <!-- 온라인 활동 -->
+    <section>
+      <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">온라인 활동</h2>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-gray-800 rounded-xl p-3 text-center">
+          <div class="text-2xl mb-1">📝</div>
+          <div class="text-xs font-semibold text-white">랄리랄리 퀴즈</div>
+          <div class="text-xs text-gray-500 mt-1">매일 구술 퀴즈</div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-3 text-center">
+          <div class="text-2xl mb-1">📋</div>
+          <div class="text-xs font-semibold text-white">모의고사</div>
+          <div class="text-xs text-gray-500 mt-1">실전 대비 시험</div>
+        </div>
+        <div class="bg-gray-800 rounded-xl p-3 text-center">
+          <div class="text-2xl mb-1">☀️</div>
+          <div class="text-xs font-semibold text-white">모닝 실기</div>
+          <div class="text-xs text-gray-500 mt-1">오전 실기 루틴</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 학습 리소스 -->
+    <section>
+      <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">학습 리소스</h2>
+      <div class="space-y-2">
+        <a href="https://gdra0n.synology.me/login" target="_blank"
+           class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-2xl p-4 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-blue-800 flex items-center justify-center text-xl flex-shrink-0">📱</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-blue-400">모바일 실기구술 기출문제집</div>
+            <div class="text-xs text-gray-400">문제풀기 · 해설 · 참고자료 · 실기 · 검색</div>
+          </div>
+          <span class="text-gray-500 text-lg">›</span>
+        </a>
+
+        <a href="https://www.youtube.com/watch?v=RBsp3Awmzj4" target="_blank"
+           class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-2xl p-4 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-red-900 flex items-center justify-center text-xl flex-shrink-0">🎬</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-red-400">포징 영상 예시</div>
+            <div class="text-xs text-gray-400">남자 보디빌딩 규정 포즈 · 채널 내 전체 영상 참고</div>
+          </div>
+          <span class="text-gray-500 text-lg">›</span>
+        </a>
+
+        <a href="https://youtu.be/jAo2iMX19FE?si=1yhzrjLZuN7-Fk7H" target="_blank"
+           class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-2xl p-4 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-orange-900 flex items-center justify-center text-xl flex-shrink-0">🏋️</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-orange-400">실기 영상 예시</div>
+            <div class="text-xs text-gray-400">실기 시험 동작 참고 영상</div>
+          </div>
+          <span class="text-gray-500 text-lg">›</span>
+        </a>
+
+        <a href="https://cafe.naver.com/f-e/cafes/30744070/menus/12?viewType=L" target="_blank"
+           class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-2xl p-4 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-green-900 flex items-center justify-center text-xl flex-shrink-0">☕</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-green-400">헝그리스포츠 게시판</div>
+            <div class="text-xs text-gray-400">네이버 카페 · 스터디 정보 공유</div>
+          </div>
+          <span class="text-gray-500 text-lg">›</span>
+        </a>
+
+        <a href="https://drive.google.com/file/d/1gxsye8IKBdav1ByTlSoDi6JuD8p8rYYX/view" target="_blank"
+           class="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-2xl p-4 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-yellow-900 flex items-center justify-center text-xl flex-shrink-0">📂</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-yellow-400">작년 기출 3000세트</div>
+            <div class="text-xs text-gray-400">Google Drive · 구술 기출 문제 모음</div>
+          </div>
+          <span class="text-gray-500 text-lg">›</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 구술 10개 주제 -->
+    <section>
+      <h2 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">구술 시험 10개 주제</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">기능해부학</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">도핑방지규정</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">생활체육</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">스포츠영양학</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">스포츠인권</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">운동생리학</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">응급처치</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">저항성트레이닝</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">종목소개</div>
+        <div class="bg-gray-800 rounded-xl px-4 py-3 text-sm text-center text-gray-200">최신규정</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================== TAB A: 구술 플래시카드 ============================== -->
+  <div id="tab-card" class="tab-content hidden max-w-xl mx-auto px-4 py-5 pb-28">
+
+    <!-- 카테고리 필터 -->
+    <div class="flex flex-wrap gap-1.5 mb-4">
+      <button class="cat-pill active text-xs px-3 py-1.5 rounded-full border border-gray-600 font-semibold"
+              data-cat="all" onclick="filterCat('all')">전체</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="해부학" onclick="filterCat('해부학')">기능해부학</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="도핑" onclick="filterCat('도핑')">도핑방지</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="생활체육" onclick="filterCat('생활체육')">생활체육</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="영양" onclick="filterCat('영양')">스포츠영양</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="인권" onclick="filterCat('인권')">스포츠인권</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="생리학" onclick="filterCat('생리학')">운동생리학</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="응급" onclick="filterCat('응급')">응급처치</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="트레이닝" onclick="filterCat('트레이닝')">저항성트레이닝</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="종목" onclick="filterCat('종목')">종목소개</button>
+      <button class="cat-pill text-xs px-3 py-1.5 rounded-full border border-gray-700 text-gray-400"
+              data-cat="규정" onclick="filterCat('규정')">최신규정</button>
+    </div>
+
+    <!-- 진행도 + 섞기 -->
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+      <span id="cardProgress" class="font-semibold">1 / 1</span>
+      <div class="flex-1 mx-3 h-1 bg-gray-800 rounded-full overflow-hidden">
+        <div id="cardProgressBar" class="h-full bg-blue-600 rounded-full transition-all duration-300" style="width:0%"></div>
+      </div>
+      <button onclick="shuffleCards()" class="text-blue-400 hover:text-blue-300">🔀 섞기</button>
+    </div>
+
+    <!-- 카드 -->
+    <div class="card-scene" style="height: 300px;">
+      <div id="theCard" class="card-body cursor-pointer" onclick="flipCard()">
+        <div id="cardFront" class="card-face bg-gray-800 border border-gray-700 rounded-2xl flex flex-col items-center justify-center p-7 text-center">
+          <div id="cardCat" class="text-xs text-blue-400 font-bold tracking-wide mb-4 uppercase"></div>
+          <div id="cardQ" class="text-base font-bold text-white leading-relaxed"></div>
+          <div class="mt-6 text-xs text-gray-600">탭하여 정답 보기</div>
+        </div>
+        <div id="cardBack" class="card-face card-back bg-blue-950 border border-blue-700 rounded-2xl flex flex-col items-center justify-center p-7 text-center">
+          <div class="text-xs text-blue-400 font-bold tracking-wide mb-4 uppercase">정답</div>
+          <div id="cardA" class="text-sm font-semibold text-white leading-relaxed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 네비게이션 (카드 탭 전용) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur border-t border-gray-800 p-4" id="cardNav">
+      <div class="max-w-xl mx-auto flex gap-3">
+        <button onclick="prevCard()"
+                class="flex-1 py-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-xl text-sm font-semibold transition-colors">← 이전</button>
+        <button onclick="flipCard()"
+                class="flex-1 py-3 bg-blue-700 hover:bg-blue-600 active:bg-blue-800 rounded-xl text-sm font-bold transition-colors">뒤집기</button>
+        <button onclick="nextCard()"
+                class="flex-1 py-3 bg-gray-800 hover:bg-gray-700 active:bg-gray-900 rounded-xl text-sm font-semibold transition-colors">다음 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== TAB B: 루틴 트래커 ============================== -->
+  <div id="tab-routine" class="tab-content hidden max-w-xl mx-auto px-4 py-5 pb-16">
+
+    <!-- 오늘 스플릿 -->
+    <div id="todaySplitCard" class="rounded-2xl p-5 mb-5 text-center border"></div>
+
+    <!-- 스플릿 선택 -->
+    <div class="flex gap-2 mb-5">
+      <button id="splitBtn-A" class="split-btn flex-1 py-2 text-xs font-semibold rounded-xl border border-gray-700 text-gray-400 transition-colors"
+              onclick="showSplit('A')">A · 가슴·삼두·전완</button>
+      <button id="splitBtn-B" class="split-btn flex-1 py-2 text-xs font-semibold rounded-xl border border-gray-700 text-gray-400 transition-colors"
+              onclick="showSplit('B')">B · 등·이두·코어</button>
+      <button id="splitBtn-C" class="split-btn flex-1 py-2 text-xs font-semibold rounded-xl border border-gray-700 text-gray-400 transition-colors"
+              onclick="showSplit('C')">C · 하체·어깨</button>
+    </div>
+
+    <!-- 운동 목록 -->
+    <div id="routineContent"></div>
+
+    <div class="flex justify-end mt-4">
+      <button onclick="resetRoutine()" class="text-xs text-gray-600 hover:text-red-400 transition-colors">오늘 기록 초기화</button>
+    </div>
+  </div>
+
+  <script>
+  // ===================== 데이터 =====================
+
+  const CARDS = [
+    // ── 기능해부학 ──────────────────────────────────────────
+    { cat:'해부학', q:'무릎을 펴는 단관절운동은 무엇이 있는가?', a:'레그 익스텐션 — 대퇴사두근이 무릎관절 하나만 사용해 무릎을 신전시키는 대표 단관절 운동' },
+    { cat:'해부학', q:'복합관절 운동 vs 단순관절 운동 설명 + 예시', a:'복합(다관절): 2개 이상 관절 사용 → 스쿼트·데드리프트·벤치프레스\n단순(단관절): 1개 관절 사용 → 레그 익스텐션·레그 컬·덤벨 컬' },
+    { cat:'해부학', q:'상완이두근 설명 및 운동종목', a:'위치: 상완 전면 / 기능: 팔꿈치 굴곡 + 전완 회외\n운동: 바벨컬 · 덤벨컬 · 컨센트레이션컬 · 해머컬' },
+    { cat:'해부학', q:'우리 몸에서 가장 큰 근육 3가지와 운동 1가지씩', a:'① 대퇴사두근 → 레그프레스\n② 대둔근 → 힙스러스트\n③ 광배근 → 랫풀다운' },
+    { cat:'해부학', q:'대퇴사두근 4가지', a:'대퇴직근 · 외측광근 · 내측광근 · 중간광근\n→ 무릎 신전(펴기) 담당' },
+    { cat:'해부학', q:'햄스트링(넓적다리) 근육 종류', a:'대퇴이두근 · 반건양근 · 반막양근\n→ 무릎 굴곡 + 고관절 신전 담당' },
+    { cat:'해부학', q:'하체근육 3가지 이상', a:'대퇴사두근 · 햄스트링(슬굴곡근) · 대둔근 · 비복근(종아리) · 내전근' },
+    { cat:'해부학', q:'광배근 운동 4가지', a:'랫풀다운 · 시티드 로우 · 풀업(턱걸이) · 벤트오버 바벨로우' },
+    { cat:'해부학', q:'척주기립근 운동 3가지 / 기능', a:'운동: 데드리프트 · 굿모닝 · 백 익스텐션\n기능: 척추 신전 · 측굴 · 직립 자세 유지' },
+    { cat:'해부학', q:'대퇴사두근 중 고관절과 무릎관절을 모두 지나는 근육은?', a:'대퇴직근 — 고관절 굴곡 + 무릎 신전 두 관절 모두 걸쳐있는 유일한 근육' },
+    { cat:'해부학', q:'팔을 귀옆으로 들어올릴 때 주동근은?', a:'극상근(회전근개) · 삼각근 중간부 — 팔 외전(Abduction) 주도' },
+    { cat:'해부학', q:'가슴을 조이는(수평모음) 운동의 주동근은?', a:'대흉근 — 어깨 수평 내전(Horizontal Adduction) 담당\n운동: 케이블 크로스오버 · 덤벨 플라이 · 펙덱 플라이' },
+    { cat:'해부학', q:'레터럴 레이즈 주동근', a:'삼각근 중간부(중삼각근) — 팔 외전(옆으로 들어올리기) 주도' },
+    { cat:'해부학', q:'슈러그 동작 주동근', a:'승모근 상부 — 어깨 거상(올리기) 담당' },
+    { cat:'해부학', q:'팔을 익스텐션(신전)할 때 사용하는 근육은?', a:'상완삼두근(트라이셉스) — 팔꿈치 신전 주동근\n운동: 푸시다운 · 오버헤드 익스텐션 · 딥스' },
+    { cat:'해부학', q:'팔을 내회전하는 데 관여하는 근육은?', a:'견갑하근(회전근개) · 대흉근 · 광배근 · 대원근 — 내회전 복합 작용' },
+    { cat:'해부학', q:'어깨 벌림(외전)에 관여하는 근육은?', a:'삼각근(중간부) · 극상근 — 외전 0~15°: 극상근 선행, 이후 삼각근 주도' },
+    { cat:'해부학', q:'데드리프트에 사용되는 심부근육(척추안정화)은?', a:'다열근 · 척추기립근 · 복횡근 · 골반저근 — 척추 중립 유지 담당' },
+    { cat:'해부학', q:'회전근개(로테이터커프) 4가지 근육은?', a:'극상근 · 극하근 · 소원근 · 견갑하근\n→ 어깨관절 안정화 + 회전 기능' },
+    { cat:'해부학', q:'ROM이란?', a:'Range of Motion — 최대관절가동범위\n관절이 움직일 수 있는 최대 각도 (유연성·부상 예방 지표)' },
+    { cat:'해부학', q:'관상면 · 시상면 · 수평면 설명', a:'관상면: 신체 앞뒤 구분 → 외전·내전 운동\n시상면: 신체 좌우 구분 → 굴곡·신전 운동\n수평면: 신체 상하 구분 → 회전 운동' },
+    { cat:'해부학', q:'골지건 기관이란?', a:'근육-힘줄 연결부에 위치한 감각수용체 — 과도한 장력 감지 시 해당 근육 이완 신호 전달 → 힘줄 파열 예방' },
+    { cat:'해부학', q:'교감신경 vs 부교감신경 설명', a:'교감신경: 흥분·운동 시 활성 (심박↑ 혈압↑ 혈당↑ 혈관수축)\n부교감신경: 안정·소화 시 활성 (심박↓ 소화 촉진)' },
+    { cat:'해부학', q:'척추뼈 이름과 갯수', a:'경추 7개 · 흉추 12개 · 요추 5개 · 천추 1개(5개 유합) · 미추 1개(4개 유합)\n→ 총 26개 (유합 전 33개)' },
+    { cat:'해부학', q:'신경근 접합부에서 신경전달물질은?', a:'아세틸콜린(Acetylcholine) — 운동신경 말단 → 근섬유 막으로 전달 → 근수축 유발' },
+    { cat:'해부학', q:'등장성 수축을 이용한 상완이두근 운동', a:'바벨컬 · 덤벨컬 — 올리는 구간(동심성) + 내리는 구간(편심성) 모두 등장성 수축\n※ 등장성 = 장력 일정, 길이 변화' },
+
+    // ── 도핑방지규정 ────────────────────────────────────────
+    { cat:'도핑', q:'TUE(치료목적사용면책)란? 승인 조건은?', a:'Therapeutic Use Exemption — 질병 치료 목적으로 금지약물 사용 시 사전 승인 받는 제도\n조건: ① 치료 목적 ② 대체 약물 없음 ③ 불공정 이익 없음 ④ 이전 TUE 위반 없음' },
+    { cat:'도핑', q:'소재지정보란? KADA가 소재지를 파악하는 이유는?', a:'소재지정보: 선수가 도핑검사관이 찾아올 수 있도록 매일 60분 이상 예고 없이 검사 가능한 장소·시간 등록\n이유: 예고 없는 불시 검사(Out-of-competition)를 위해' },
+    { cat:'도핑', q:'도핑 검사를 거부할 수 있는가?', a:'거부 불가 — 도핑 검사 거부는 도핑 위반(양성 반응)과 동일하게 처리\n제재: 의도적 위반 간주 → 최대 4년 자격 정지' },
+    { cat:'도핑', q:'도핑 시 소변검사 대신 혈액검사로 대체 가능한가?', a:'대체 불가 — 소변검사가 기본\n단, EPO·HGH·수혈 검사 등 특정 물질은 혈액검사 병행 가능 (추가적 방법으로만)' },
+    { cat:'도핑', q:'도핑 적발 시 선수가 먹은 음식이 관련 있다고 항변하면?', a:'엄격책임(Strict Liability) 원칙 — 섭취 경위 불문하고 선수 책임\n단, 오염식품 등 비의도적 증명 시 제재 감경 가능 (4년 → 2년 이하)' },
+    { cat:'도핑', q:'치료목적 도핑 위반 시 책임과 이유는?', a:'TUE 승인 없이 금지약물 사용 시 도핑 위반 → 엄격책임 적용\n이유: TUE는 사전 승인이 원칙 — 사후 면책 불인정' },
+    { cat:'도핑', q:'금지약물을 의료상 사용해야 할 경우 절차는?', a:'① KADA에 TUE 신청서 제출 ② 의사 소견서·진단서 첨부 ③ 검토·승인 후 사용 ④ 응급 시 사후 신청 가능 (72시간 이내)' },
+    { cat:'도핑', q:'국내 도핑방지 전담 기관과 주요 역할은?', a:'한국도핑방지위원회(KADA) — 도핑검사 실시 · TUE 심사 · 소재지 관리 · 선수 교육' },
+
+    // ── 생활체육 ────────────────────────────────────────────
+    { cat:'생활체육', q:'생활체육의 3대 요소(구성 3가지)는?', a:'① 생활체육 참가자 ② 생활체육 지도자 ③ 생활체육 시설·프로그램' },
+    { cat:'생활체육', q:'생활체육의 목적은?', a:'국민의 체력 증진 · 건강 유지 · 여가 선용 · 삶의 질 향상 · 사회통합 기여' },
+    { cat:'생활체육', q:'생활체육의 기능 (생리적·심리적·사회적)', a:'생리적: 체력증진 · 질병 예방 · 체중 관리\n심리적: 스트레스 해소 · 자아실현 · 자신감 향상\n사회적: 공동체 형성 · 사회통합 · 여가문화 발전' },
+    { cat:'생활체육', q:'생애주기별 생활체육 고려방안은?', a:'유아: 기본 동작 발달 / 청소년: 성장·기초체력 / 성인: 건강유지·여가 / 노인: 낙상예방·유연성·사회참여' },
+    { cat:'생활체육', q:'생활체육의 이념(생체지도이념)은?', a:'평생체육 이념 — 전 연령·전 계층이 생애 전반에 걸쳐 지속적으로 스포츠에 참여하는 것' },
+    { cat:'생활체육', q:'생활체육 프로그램 기획 시 고려사항은?', a:'대상자 연령·체력 수준 · 목적(건강/여가/경쟁) · 안전성 · 접근성 · 지속 가능성 · FITT 원칙 적용' },
+    { cat:'생활체육', q:'생활체육지도자가 필요한 이유는?', a:'과학적이고 안전한 운동 지도 · 부상 예방 · 동기부여 · 맞춤형 프로그램 제공 · 체육 생활화 촉진' },
+    { cat:'생활체육', q:'생활체육지도 시 유의할 점 4가지', a:'① 참가자 건강 상태·체력 수준 확인 ② 안전한 환경 조성 ③ 개인차 고려한 프로그램 ④ 응급상황 대비 계획 수립' },
+    { cat:'생활체육', q:'스포츠 지도자의 자질은?', a:'전문 지식 · 지도 기술 · 의사소통 능력 · 인격·인권 존중 · 윤리의식 · 안전 관리 능력' },
+    { cat:'생활체육', q:'초보자 운동 지도 시 원칙은?', a:'낮은 강도에서 시작 → 점진적 증가 / 복합운동 전 단순동작 숙달 / 충분한 휴식 / 올바른 자세 우선' },
+
+    // ── 스포츠영양학 ─────────────────────────────────────────
+    { cat:'영양', q:'3대 영양소 + ATP 합성 시 사용 영양소는?', a:'3대 영양소: 탄수화물(4kcal) · 단백질(4kcal) · 지방(9kcal)\nATP 합성: 탄수화물(무산소/유산소) → 지방(장시간 유산소) → 단백질(최후 수단)' },
+    { cat:'영양', q:'운동 1시간 전에 당(탄수화물)을 섭취해야 하는 이유는?', a:'운동 직전 과다섭취 → 인슐린 분비 → 혈당 급강하(반동성 저혈당) → 운동 능력 저하\n∴ 1시간 전 섭취로 혈당 안정화 후 운동 (당이 2배 감소하는 현상 방지)' },
+    { cat:'영양', q:'카보로딩(글리코겐 로딩)이란?', a:'대회 전 탄수화물을 고용량 섭취하여 근육 내 글리코겐 저장량을 극대화하는 방법\n목적: 펌핑 극대화 · 지구력 향상 · 근육 풍성함' },
+    { cat:'영양', q:'카페인 효과와 적정 섭취량은?', a:'효과: 각성 · 집중력↑ · 지방 산화↑ · 피로 감소 · 운동 수행능력 향상\n섭취량: 3~6mg/kg (체중 70kg → 210~420mg) / 경기 60분 전 섭취 권장' },
+    { cat:'영양', q:'비타민C 역할·기능 / 괴혈병과의 관계는?', a:'기능: 콜라겐 합성 · 면역력 강화 · 항산화 · 철분 흡수 촉진\n결핍 시: 괴혈병(Scurvy) — 잇몸 출혈·피부 출혈·상처 치유 지연' },
+    { cat:'영양', q:'불포화지방 vs 포화지방 설명', a:'포화지방: 동물성(버터·삼겹살) · 상온에서 고체 · LDL↑ → 심혈관 위험\n불포화지방: 식물성·어류(올리브유·등푸른생선) · 상온에서 액체 · HDL↑ → 심혈관 보호' },
+    { cat:'영양', q:'필수지방산 설명 / 혈중 콜레스테롤 운반 지방은?', a:'필수지방산: 체내 합성 불가, 음식으로 섭취 필요 — 오메가3(EPA·DHA)·오메가6(리놀레산)\n혈중 콜레스테롤 운반: LDL(나쁜) · HDL(좋은) 지단백질' },
+    { cat:'영양', q:'필수아미노산 9가지 (3가지 이상)', a:'발린 · 류신 · 이소류신 · 트레오닌 · 메티오닌 · 라이신 · 페닐알라닌 · 히스티딘 · 트립토판\n암기: "발류이트메라페히트"' },
+    { cat:'영양', q:'BCAA란?', a:'분지사슬아미노산 (Branched-Chain Amino Acid)\n구성: 류신 · 이소류신 · 발린 (필수아미노산)\n효과: 근합성 촉진 · 운동 중 피로 지연 · 근분해 억제' },
+    { cat:'영양', q:'단백질을 에너지원으로 사용했을 때 단점은?', a:'① 근육 분해(근손실) 발생\n② 암모니아 생성 → 간·신장 부담\n③ 에너지 효율 낮음 (탈아미노 과정 필요)' },
+    { cat:'영양', q:'탄수화물을 에너지원으로 사용할 때 단점은?', a:'① 저장량 한정 (글리코겐 약 400~500g)\n② 장시간 운동 시 고갈 → 피로\n③ 과잉 섭취 시 지방으로 전환·축적' },
+    { cat:'영양', q:'지방이 에너지원으로 사용될 때 단점은?', a:'① 저강도 운동에서만 효율적 (산소 필요)\n② 에너지 전환 속도 느림\n③ 고강도 운동 시 부적합 / 과잉 축적 시 비만·심혈관 질환' },
+    { cat:'영양', q:'에너지원 부족 시 여성에게 발생하는 질환 3가지는?', a:'① 골다공증 (칼슘·에스트로겐 저하)\n② 무월경 (여성 호르몬 감소)\n③ 빈혈 (철분 부족)' },
+    { cat:'영양', q:'크레아틴 섭취 이유는?', a:'ATP-PC 시스템에서 인산기 공급 → ATP 빠른 재합성 → 고강도 단시간 운동 능력↑ (최대근력·순발력 향상)\n운동 후 섭취 시 효과적' },
+    { cat:'영양', q:'테스토스테론 역할 및 운동 중 작용 효과는?', a:'역할: 단백질 합성 촉진 · 근비대 · 골밀도↑ · 지방 분해↑\n운동 중: 저항성 훈련 후 급격히 분비 → 근육 회복·성장 촉진' },
+    { cat:'영양', q:'수분의 역할 / 운동 중 수분 섭취가 중요한 이유는?', a:'역할: 체온조절 · 영양소 운반 · 노폐물 배출 · 관절 윤활\n이유: 체중 2% 탈수 시 운동 능력 20% 저하 · 열사병 위험' },
+    { cat:'영양', q:'탈수 증상·원인은?', a:'증상: 갈증 · 피로 · 두통 · 어지러움 · 소변색 진해짐 · 심박↑\n원인: 발한 · 고온환경 · 불충분한 수분 섭취' },
+    { cat:'영양', q:'기초대사량이란?', a:'아무런 활동 없이 생명 유지에 필요한 최소 에너지량\n결정 요인: 체중·근육량·연령·성별 (근육량이 많을수록 기초대사량 높음)' },
+    { cat:'영양', q:'글루카곤의 기능 / 운동 시 역할은?', a:'기능: 혈당 저하 시 간에서 글리코겐 분해 → 혈당↑ (인슐린과 반대 작용)\n운동 시: 혈당 유지를 위해 간 글리코겐 분해 촉진 → 근육에 포도당 공급' },
+    { cat:'영양', q:'3대 에너지 시스템은?', a:'① ATP-PC 시스템: 무산소 · ~10초 · 폭발적 고강도\n② 해당과정(젖산): 무산소 · 10초~2분 · 중강도\n③ 유산소(산화적): 유산소 · 2분 이상 · 지구력' },
+
+    // ── 운동생리학 ──────────────────────────────────────────
+    { cat:'생리학', q:'초과회복이란?', a:'훈련 후 피로 회복 과정에서 운동 전보다 더 높은 체력 수준으로 회복되는 현상\n적정 휴식이 필수 — 과훈련 시 발생 안 함' },
+    { cat:'생리학', q:'유산소 vs 무산소 운동 차이는?', a:'유산소: 산소 이용 · 장시간 지속 · 지방·탄수화물 연소 · 심폐체력↑ (달리기·수영)\n무산소: 산소 없이 · 단시간 고강도 · 젖산 생성 · 근력·근육량↑ (웨이트)' },
+    { cat:'생리학', q:'무산소 운동 시 근피로가 오는 이유는?', a:'산소 없이 글리코겐 분해 → 젖산(유산) 축적 → 근육 내 pH↓ (산성화) → 효소 활성 저하 → 근수축력 감소' },
+    { cat:'생리학', q:'젖산이 생성되는 원인은?', a:'무산소성 해당과정에서 포도당 분해 → 피루브산 생성 → 산소 부족 시 젖산으로 전환\n(산소 충분 시: 피루브산 → TCA 회로로 유산소 대사)' },
+    { cat:'생리학', q:'EPOC(초과산소섭취량)이란?', a:'운동 후 산소소비량이 운동 전 수준으로 돌아오기까지 추가로 소비되는 산소량\n고강도 운동 후 클수록 더 많은 칼로리 소모 (애프터번 효과)' },
+    { cat:'생리학', q:'심박출량 정의 + 계산 공식은?', a:'심박출량 = 1회박출량(SV) × 심박수(HR)\n1분간 심장이 내보내는 혈액의 총량 (안정 시 약 5L/분)' },
+    { cat:'생리학', q:'목표심박수 구하는 공식은? (카르보넨 공식)', a:'목표심박수 = (최대심박수 - 안정시심박수) × 운동강도% + 안정시심박수\n최대심박수 = 220 - 나이' },
+    { cat:'생리학', q:'호흡교환율(RER)이란?', a:'호흡교환율 = CO₂ 배출량 / O₂ 섭취량\n1.0: 탄수화물 연소 / 0.7: 지방 연소 / 0.85: 혼합\n→ 운동강도 증가 시 1.0에 가까워짐' },
+    { cat:'생리학', q:'아나볼릭·카타볼릭 상태란?', a:'아나볼릭(동화): 단백질 합성 · 근육 성장 (운동 후 + 충분한 영양·휴식)\n카타볼릭(이화): 근육 분해 (과훈련 · 영양 부족 · 스트레스 시)' },
+    { cat:'생리학', q:'지근(Type I) vs 속근(Type II) 비교', a:'지근(Type I): 느리고 피로 저항↑ · 유산소 · 마라톤·자세유지근\n속근(Type II): 빠르고 강함 · 피로 빠름 · 무산소·파워 운동\n※ 웨이트 훈련 시 주로 속근 발달' },
+    { cat:'생리학', q:'발살바 호흡 장단점', a:'방법: 숨 참고 복압 올려 척추 안정화\n장점: 척추 보호 · 최대근력 발휘 가능\n단점: 혈압 급상승 위험 · 심혈관 질환자 금지' },
+    { cat:'생리학', q:'포도당신생합성(Gluconeogenesis)이란?', a:'포도당 이외의 물질(아미노산·젖산·글리세롤)에서 포도당을 새로 합성하는 과정\n간에서 주로 발생 — 공복·장시간 운동 시 혈당 유지' },
+    { cat:'생리학', q:'오버트레이닝이란? 증상은?', a:'회복을 초과하는 과도한 훈련량으로 인한 만성 피로 상태\n증상: 운동 성과↓ · 지속적 피로 · 수면장애 · 기분 저하 · 면역력↓ · 식욕 저하' },
+    { cat:'생리학', q:'코리회로(Cori Cycle)란?', a:'근육에서 생성된 젖산 → 혈액으로 방출 → 간에서 포도당으로 재합성 → 근육으로 공급\n무산소 운동 후 젖산 제거 메커니즘' },
+
+    // ── 응급처치 ────────────────────────────────────────────
+    { cat:'응급', q:'CPR 순서를 설명하시오', a:'① 의식 확인 → ② 119 신고+AED 요청 → ③ 호흡 확인 → ④ 가슴압박 30회 (5~6cm, 100~120회/분) → ⑤ 인공호흡 2회 → ⑥ 반복' },
+    { cat:'응급', q:'CPR(심폐소생술)을 중단해야 하는 경우는?', a:'① 자발 호흡·맥박 회복 ② AED 분석 지시 ③ 의료진 도착·인계 ④ 구조자 탈진 ⑤ 명백한 사망징후 확인' },
+    { cat:'응급', q:'CPR 시 가슴을 깊게 압박해야 하는 이유는?', a:'충분한 깊이(5~6cm)로 압박해야 심장을 물리적으로 눌러 혈액을 순환시킬 수 있기 때문\n얕은 압박은 혈류 생성 불가' },
+    { cat:'응급', q:'AED란? 접촉 금지 상황 2가지는?', a:'AED(자동제세동기): 심실세동 시 전기충격으로 정상 리듬 회복 장치\n접촉 금지: ① "분석 중" 표시 ② "충격 버튼 누르기 전" (주위 사람 접촉 시 감전 위험)\n→ "물러나세요!" 2번 외침' },
+    { cat:'응급', q:'기도폐쇄의 종류와 응급처치 방법은?', a:'부분폐쇄: 기침 유도 (기침할 수 있으면 계속 유도)\n완전폐쇄: 하임리히법 (복부 밀어올리기) / 영아는 등 두드리기+가슴 압박\n의식 없으면: CPR 전환' },
+    { cat:'응급', q:'기도폐쇄 확인 방법은?', a:'① "괜찮으세요?" 말 가능 여부 ② 기침 가능 여부 ③ 청색증(입술·손끝) 확인 ④ 목 잡는 행동(보편적 질식 신호) 관찰' },
+    { cat:'응급', q:'저체온증 정의·증상·응급처치', a:'정의: 핵심 체온 35°C 이하\n증상: 떨림(33°C이하 멈춤) · 의식저하 · 피부창백·청색 · 맥박 느려짐\n처치: 따뜻한 곳 이동 · 젖은 옷 제거 · 담요 보온 · 따뜻한 음료(의식 있을 때) · 119' },
+    { cat:'응급', q:'화상 응급처치 (1·2·3도 구분)', a:'1도: 표피 → 흐르는 냉수 10~20분\n2도: 표피+진피, 수포 → 냉수 냉각, 수포 터뜨리지 않기, 병원\n3도: 전층 괴사, 검게 탐 → 냉수 금지, 덮개 덮고 즉시 119' },
+    { cat:'응급', q:'PRICE(응급처치 원칙)란?', a:'Protection(보호) · Rest(안정) · Ice(냉찜질) · Compression(압박) · Elevation(거상)\n근골격계 급성 손상(염좌·타박상) 기본 처치 / RICE에 보호 추가' },
+    { cat:'응급', q:'출혈 시 응급처치 순서는?', a:'① 직접 압박(깨끗한 천·거즈로 지속 압박) ② 거상(심장보다 높이) ③ 압박붕대 적용 ④ 지혈 안 되면 압박점 압박 ⑤ 119 신고' },
+    { cat:'응급', q:'드레싱하는 목적·이유는?', a:'① 상처 보호(오염·감염 예방) ② 출혈 억제 ③ 습윤 환경 유지(치유 촉진) ④ 이물질 차단' },
+    { cat:'응급', q:'쇼크의 종류는?', a:'① 심인성(심장 기능 저하) ② 저혈량성(출혈·탈수) ③ 분포성(아나필락시스·패혈증) ④ 폐쇄성(기흉·심낭압전)' },
+    { cat:'응급', q:'골절의 종류 (피부·연부조직 관련)', a:'폐쇄성 골절: 피부 손상 없음\n개방성 골절: 피부 뚫고 뼈 노출 → 감염 위험↑ → 즉시 119, 이물질 제거 금지' },
+    { cat:'응급', q:'에피네프린(Epinephrine)이란?', a:'아나필락시스(극심한 알레르기) 응급 치료제\n작용: 기관지 확장 · 혈압↑ · 심박↑ · 혈관수축\n투여: 에피펜 허벅지 근육주사 → 즉시 119' },
+
+    // ── 저항성트레이닝 ──────────────────────────────────────
+    { cat:'트레이닝', q:'트라이세트 vs 자이언트세트 설명', a:'트라이세트: 같은 근육군 3가지 운동을 쉬지 않고 연속 실시\n자이언트세트: 같은 근육군 4가지 이상 운동을 쉬지 않고 연속 실시\n→ 고강도 펌핑·근지구력 향상' },
+    { cat:'트레이닝', q:'피라미드 세트 vs 디센딩(드롭) 세트 설명', a:'피라미드: 무게↑ 횟수↓ (예: 15→12→10→8회)\n디센딩(드롭)세트: 무게↓ 횟수↑, 마지막 세트에서 무게를 낮추며 횟수 늘려 한계 초과' },
+    { cat:'트레이닝', q:'Set, Rep이란?', a:'Rep(Repetition): 한 동작을 1회 완전히 수행하는 단위\nSet: 정해진 Rep을 묶은 단위 (예: 12회 × 3세트)' },
+    { cat:'트레이닝', q:'서킷트레이닝이란? 몇 종목?', a:'여러 운동(보통 6~12종목)을 쉬지 않고 순환식으로 실시\n효과: 근지구력 + 심폐체력 동시 향상 / 시간 효율 높음' },
+    { cat:'트레이닝', q:'트레이닝의 원리 5가지는?', a:'① 과부하의 원리 ② 특이성의 원리 ③ 가역성의 원리 ④ 개별성의 원리 ⑤ 다양성의 원리' },
+    { cat:'트레이닝', q:'FITT 설명', a:'F — Frequency(빈도): 주 몇 회\nI — Intensity(강도): 1RM의 몇 %\nT — Time(시간): 운동 지속 시간\nT — Type(유형): 운동 종류\n→ 운동 처방 4가지 핵심 변수' },
+    { cat:'트레이닝', q:'머신 vs 프리웨이트 차이점', a:'머신: 고정된 궤적 · 안정적 · 초보자·재활 적합 · 단일 근육 집중\n프리웨이트: 자유로운 궤적 · 안정화 근육 동원 · 기능적 동작 · 협응력↑' },
+    { cat:'트레이닝', q:'선피로 훈련 vs 근우선훈련법 차이는?', a:'선피로(Pre-exhaustion): 보조근을 먼저 피로시킨 후 복합운동으로 주동근 자극 극대화\n예) 케이블 플라이 → 벤치프레스\n근우선(Priority): 약한 근육이나 발달이 필요한 부위를 세션 처음에 먼저 훈련' },
+    { cat:'트레이닝', q:'치팅 vs 스트레이팅이란?', a:'치팅: 반동이나 다른 근육을 이용해 정자세 한계를 넘어 목표 근육을 추가 자극하는 기법\n스트레이팅: 정자세를 끝까지 유지하며 순수 근력으로만 수행 (대조 개념)' },
+    { cat:'트레이닝', q:'번즈(Burns) 훈련이란?', a:'세트 마지막 한계 후, 부분 가동범위(반 동작)를 빠르게 반복하는 기법\n목적: 근육 내 혈액 충혈(펌핑) 극대화 · 근지구력 향상' },
+    { cat:'트레이닝', q:'근력을 결정짓는 요소 3가지는?', a:'① 근육 횡단면적(굵기) — 근섬유 수·크기\n② 신경 동원율 — 운동단위 동원 수·빈도\n③ 근섬유 유형 비율 — 속근 비율 높을수록 최대근력 유리' },
+    { cat:'트레이닝', q:'공복 시 고강도 운동이 안 되는 이유는?', a:'혈당 낮음 → 글리코겐 고갈 → 근육 에너지 부족 → 운동 능력↓\n→ 단백질 이화 위험(근손실) / 저혈당·어지러움 위험' },
+    { cat:'트레이닝', q:'분할 훈련 원칙 및 훈련법 설명', a:'원칙: 동일 근군에 48~72시간 회복 보장\n3분할: 월목(가슴·삼두) / 화금(등·이두) / 수토(하체·어깨)\n장점: 각 근육군 집중 자극 · 회복 최적화' },
+    { cat:'트레이닝', q:'그립 종류 3가지 이상는?', a:'오버핸드(프로네이션) · 언더핸드(수피네이션) · 뉴트럴(해머) · 믹스드(혼합) · 훅 그립' },
+
+    // ── 종목소개 ────────────────────────────────────────────
+    { cat:'종목', q:'쿼터턴만 있는 종목 3가지는?', a:'① 남자 피지크 ② 여자 피지크 ③ 여자 비키니\n(여자 보디피트니스도 쿼터턴 포함)' },
+    { cat:'종목', q:'보디빌딩 규정 포즈 7가지는?', a:'① 프론트 더블 바이셉스\n② 프론트 라트 스프레드\n③ 사이드 체스트\n④ 사이드 트라이셉스\n⑤ 백 더블 바이셉스\n⑥ 백 라트 스프레드\n⑦ 앱도미널 앤 사이즈' },
+    { cat:'종목', q:'클래식 보디빌딩 예선·결선 진행방식은?', a:'예선: 그룹별 쿼터턴 4방향 → 규정포즈 7가지 → 상위 선발\n결선: 규정포즈 7가지 개인심사 → 포즈다운 → 오버롤' },
+    { cat:'종목', q:'IFBB 클래식 피지크 예선·결선 라운드는?', a:'예선 라운드: 그룹 쿼터턴 + 규정포즈 7가지\n결선 라운드: 규정포즈 7가지 개인심사 + 포즈다운\n→ 체중 제한 있음, 바지(쿼터팬츠) 착용' },
+    { cat:'종목', q:'남자 피지크 경기진행방식 + 규정 동작 4가지는?', a:'진행: 쿼터턴 4방향(예선) → 결선 개인심사 → 포즈다운\n4가지 규정 동작: ① 프론트 ② 사이드(左) ③ 백 ④ 사이드(右)' },
+    { cat:'종목', q:'여자 피지크 경기진행방식은?', a:'예선: 그룹 쿼터턴 4방향\n결선: 쿼터턴 + 규정포즈 4가지 개인심사 + 포즈다운\n복장: 비키니 + 하이힐' },
+    { cat:'종목', q:'여자 보디피트니스란? 진행순서는?', a:'근육 발달보다 건강미·균형미 강조 종목\n예선: 그룹 쿼터턴 → 결선: 개인 쿼터턴 + 자유포즈 루틴\n복장: 비키니 + 하이힐 / 쿼터턴 포함' },
+    { cat:'종목', q:'여자 비키니 경기방식은?', a:'예선: 그룹 쿼터턴 4방향\n결선: 개인 쿼터턴 → 앞면·뒷면 비교심사 → 포즈다운\n심사: 전체 균형·피부상태·복장·자신감 중심 (근육량 최소)' },
+    { cat:'종목', q:'보디빌딩이란? (정의)', a:'저항성 훈련을 통해 근육을 최대로 발달시키고, 근육의 크기·대칭·균형·선명도를 심사하는 스포츠' },
+    { cat:'종목', q:'드레싱하는 목적·이유는?', a:'근육 선명도(근분리·혈관) 극대화 및 피부 윤기를 위해 대회 전 오일·태닝크림을 바르는 것\n목적: 무대 조명 아래 근육 윤곽 강조' },
+    { cat:'종목', q:'남자 복장규정: 피지크 vs 클래식 피지크 vs 보디빌딩', a:'보디빌딩: 짧은 포즈팬티\n클래식피지크: 쿼터팬츠(바지)\n피지크: 보드숏(서핑바지) — 길이·색상 규정 있음' },
+    { cat:'종목', q:'여자 복장규정: 비키니 vs 피지크 vs 보디피트니스', a:'비키니: 2피스 비키니 + 하이힐\n피지크: 비키니 + 하이힐 (근육 발달 더 강조)\n보디피트니스: 비키니 + 하이힐 / 같으나 심사 기준 다름' },
+    { cat:'종목', q:'대회 컬러링(태닝) 규정은?', a:'일반적으로 인공태닝 허용 (스프레이탄·크림)\n형광색·금속성 광택 금지\n색상: 자연스러운 갈색 계열 권장\n※ 단체마다 세부 규정 상이' },
+
+    // ── 최신규정 (경기인 등록) ───────────────────────────────
+    { cat:'규정', q:'경기인 등록규정의 목적은?', a:'선수의 자격 관리 · 공정한 경기 환경 조성 · 도핑검사 소재지 파악 · 경기인 보호 및 권익 보장' },
+    { cat:'규정', q:'연령·목적에 따른 생활체육경기인 등록구분은?', a:'연령: 일반부(성인) / 주니어 / 마스터즈(연령별)\n목적: 생활체육부 / 학생부(대학부) / 실업부' },
+    { cat:'규정', q:'경기인 등록 취소·해지 사유는?', a:'① 본인 신청 탈퇴 ② 사망 ③ 도핑 적발 자격 정지 ④ 타 단체 이적 ⑤ 등록료 미납 ⑥ 결격사유 발생' },
+    { cat:'규정', q:'경기인 결격사유는?', a:'① 금치산자·한정치산자 ② 금고 이상 형 선고 ③ 도핑 위반 자격 정지 중 ④ 협회 징계 중인 자 ⑤ 법령 위반자' },
+    { cat:'규정', q:'소재지정보란? 소재지 변경 방법은?', a:'소재지정보: KADA 도핑검사를 위해 선수가 매일 60분 이상 검사 가능 장소·시간 등록\n변경: KADA 홈페이지 로그인 → 소재지정보 수정 → 24시간 이내 반영' },
+    { cat:'규정', q:'대보협 지도자 등록 절차·방법은?', a:'① 생활스포츠지도사 2급(보디빌딩) 자격 취득 ② KBBF 홈페이지 지도자 등록 신청 ③ 서류 제출(자격증·사진·수수료) ④ 심사 후 등록증 발급' },
+    { cat:'규정', q:'경기인 등록 이전(소속변경) 방법은?', a:'① 현 소속팀 동의서 ② 이전 신청서 작성 ③ KBBF에 제출 ④ 이전 등록 기간 내 처리\n※ 이전 등록 기간 외에는 이적 불가' },
+    { cat:'규정', q:'선수 소속·주소지 변경 등록 방법은?', a:'KBBF 또는 시·도 협회 공식 홈페이지에서 변경 신청\n필요 서류: 변경 사유서 · 새 소속 확인서 · 주소 증빙\n처리 기간: 7일 이내' },
+    { cat:'규정', q:'대학부 보디빌딩 경기인 등록규정은?', a:'재학증명서 + 학생증 제출 필수\n등록 기간: 매년 협회 공지 일정 내\n자격: 해당 연도 재학 중인 대학(원)생' },
+    { cat:'규정', q:'보디빌딩 스포츠지도사 취득 후 받아야 할 교육은?', a:'보수교육: 취득 후 3년, 이후 3년마다 의무 이수\n내용: 스포츠 인권 · 도핑방지 · 안전 관리 · 최신 지도법 등' },
+
+    // ── 스포츠인권 ──────────────────────────────────────────
+    { cat:'인권', q:'스포츠 폭력의 유형 4가지는?', a:'① 신체적 폭력 (구타·체벌)\n② 언어·심리적 폭력 (욕설·협박·따돌림)\n③ 성적 폭력 (성추행·성폭행)\n④ 경제적 폭력 (금품갈취·합숙비 착취)' },
+    { cat:'인권', q:'스포츠 성폭력 정의와 원인 3가지 이상은?', a:'정의: 스포츠 맥락에서 발생하는 모든 성적 언행·접촉·강요\n원인: ① 위계적 권력 구조 ② 폐쇄적 합숙 환경 ③ 성인지 감수성 부족 ④ 신고·처벌 미흡' },
+    { cat:'인권', q:'성폭력 2차 피해란? 예방법 4가지는?', a:'2차 피해: 피해자가 신고·공개 후 받는 또 다른 피해 (비난·불이익·소문·보복)\n예방법: ① 피해자 신원 보호 ② 사실 확인 전 단정 금지 ③ 지지적 태도 유지 ④ 신고 채널 활성화' },
+    { cat:'인권', q:'합숙 시 성폭력 예방 행동 4가지 이상은?', a:'① 남녀 숙소 분리 ② 음주 금지·통제 ③ 취침 시간 외 이동 제한 ④ 인권 교육 정기 실시 ⑤ 익명 신고 시스템 운영 ⑥ 2인 이상 원칙' },
+    { cat:'인권', q:'훈련장·경기장에서 폭력 예방법 4가지는?', a:'① 폭력 무관용 원칙 공표 ② CCTV 등 모니터링 ③ 인권 담당자 지정 ④ 정기적 인권 실태 점검 (선수 대상 설문)' },
+    { cat:'인권', q:'스포츠 폭력 방지를 위한 지도자 역할 4가지는?', a:'① 체벌·욕설 금지 ② 선수 의견 존중 ③ 공정한 규칙 적용 ④ 폭력 목격 시 즉시 신고 및 개입' },
+    { cat:'인권', q:'성폭행 시 응급대응이 중요한 이유는?', a:'① 증거 보존 (세탁·샤워 전 신고) ② 2차 감염·임신 예방 (72시간 내 응급약) ③ 피해자 심리 지지 ④ 법적 대응 기반 마련' },
+    { cat:'인권', q:'성적 자기결정권이란?', a:'자신의 성적 행위에 대해 스스로 결정할 수 있는 권리\n→ 어떠한 성적 행위도 상대방의 자유로운 동의 없이는 불법' },
+  ];
+
+  const ROUTINES = {
+    A: {
+      label: '가슴 · 삼두 · 전완',
+      days: '월요일 · 목요일',
+      emoji: '🏋️',
+      groups: [
+        { name: '가슴', items: ['바벨 벤치프레스', '인클라인 덤벨 프레스', '덤벨 플라이', '케이블 크로스오버'] },
+        { name: '삼두', items: ['트라이셉스 푸시다운', '오버헤드 트라이셉스 익스텐션', '딥스'] },
+        { name: '전완', items: ['바벨 리스트 컬', '해머 컬', '리버스 컬'] },
+      ]
+    },
+    B: {
+      label: '등 · 이두 · 코어',
+      days: '화요일 · 금요일',
+      emoji: '🦾',
+      groups: [
+        { name: '등', items: ['데드리프트', '바벨 로우', '랫 풀다운', '시티드 로우', '풀업'] },
+        { name: '이두', items: ['바벨 컬', '덤벨 컬', '컨센트레이션 컬'] },
+        { name: '코어', items: ['플랭크 (60초)', '크런치', '레그레이즈', '케이블 우드촙'] },
+      ]
+    },
+    C: {
+      label: '하체 · 어깨',
+      days: '수요일 · 토요일',
+      emoji: '🦵',
+      groups: [
+        { name: '하체', items: ['스쿼트', '레그 프레스', '레그 익스텐션', '레그 컬', '카프 레이즈'] },
+        { name: '어깨', items: ['오버헤드 프레스', '사이드 레터럴 레이즈', '프론트 레이즈', '리어 델트 플라이', '페이스 풀'] },
+      ]
+    }
+  };
+
+  // ===================== 상태 =====================
+  let filteredCards = [...CARDS];
+  let cardIdx = 0;
+  let currentSplit = 'A';
+
+  // ===================== 탭 =====================
+  function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => {
+      el.classList.remove('active', 'text-blue-400');
+      el.classList.add('text-gray-500');
+    });
+    document.getElementById('tab-' + tab).classList.remove('hidden');
+    const btn = document.querySelector(`[data-tab="${tab}"]`);
+    btn.classList.add('active', 'text-blue-400');
+    btn.classList.remove('text-gray-500');
+    document.getElementById('cardNav').style.display = tab === 'card' ? 'block' : 'none';
+  }
+
+  // ===================== 헤더 =====================
+  function initHeader() {
+    const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+    const now = new Date();
+    document.getElementById('headerDate').textContent =
+      `${now.getMonth()+1}/${now.getDate()}(${DAYS[now.getDay()]})`;
+  }
+
+  // ===================== 플래시카드 =====================
+  const CAT_LABELS = {
+    해부학:'기능해부학', 도핑:'도핑방지규정', 생활체육:'생활체육',
+    영양:'스포츠영양학', 인권:'스포츠인권', 생리학:'운동생리학',
+    응급:'응급처치', 트레이닝:'저항성트레이닝', 종목:'종목소개', 규정:'최신규정'
+  };
+
+  function filterCat(cat) {
+    document.querySelectorAll('.cat-pill').forEach(el => {
+      el.classList.remove('active');
+      el.classList.add('text-gray-400');
+    });
+    const active = document.querySelector(`.cat-pill[data-cat="${cat}"]`);
+    active.classList.add('active');
+    active.classList.remove('text-gray-400');
+
+    filteredCards = cat === 'all' ? [...CARDS] : CARDS.filter(c => c.cat === cat);
+    cardIdx = 0;
+    renderCard(false);
+  }
+
+  function renderCard(keepFlip) {
+    const card = filteredCards[cardIdx];
+    if (!card) return;
+    const body = document.getElementById('theCard');
+    if (!keepFlip) body.classList.remove('flipped');
+    document.getElementById('cardCat').textContent = CAT_LABELS[card.cat] || card.cat;
+    document.getElementById('cardQ').textContent = card.q;
+    document.getElementById('cardA').textContent = card.a;
+    const total = filteredCards.length;
+    document.getElementById('cardProgress').textContent = `${cardIdx + 1} / ${total}`;
+    document.getElementById('cardProgressBar').style.width = `${((cardIdx + 1) / total) * 100}%`;
+  }
+
+  function flipCard() {
+    document.getElementById('theCard').classList.toggle('flipped');
+  }
+  function nextCard() {
+    cardIdx = (cardIdx + 1) % filteredCards.length;
+    renderCard(false);
+  }
+  function prevCard() {
+    cardIdx = (cardIdx - 1 + filteredCards.length) % filteredCards.length;
+    renderCard(false);
+  }
+  function shuffleCards() {
+    for (let i = filteredCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+    }
+    cardIdx = 0;
+    renderCard(false);
+  }
+
+  // ===================== 루틴 트래커 =====================
+  function getTodaySplit() {
+    const day = new Date().getDay(); // 0=일
+    if (day === 1 || day === 4) return 'A';
+    if (day === 2 || day === 5) return 'B';
+    if (day === 3 || day === 6) return 'C';
+    return null;
+  }
+
+  function initTodaySplit() {
+    const DAYNAMES = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const today = DAYNAMES[new Date().getDay()];
+    const split = getTodaySplit();
+    const el = document.getElementById('todaySplitCard');
+    if (split) {
+      const r = ROUTINES[split];
+      el.className = 'rounded-2xl p-5 mb-5 text-center border bg-blue-950 border-blue-700';
+      el.innerHTML = `
+        <div class="text-xs text-blue-400 mb-1">${today} · 오늘의 루틴</div>
+        <div class="text-3xl mb-1">${r.emoji}</div>
+        <div class="text-2xl font-black text-white">Split ${split}</div>
+        <div class="text-sm text-blue-200 mt-1">${r.label}</div>
+        <div class="text-xs text-blue-400 mt-1">${r.days}</div>`;
+    } else {
+      el.className = 'rounded-2xl p-5 mb-5 text-center border bg-gray-800 border-gray-700';
+      el.innerHTML = `
+        <div class="text-xs text-gray-400 mb-2">${today}</div>
+        <div class="text-3xl mb-2">🛌</div>
+        <div class="text-lg font-bold text-gray-300">휴식일</div>
+        <div class="text-xs text-gray-500 mt-1">오늘은 회복에 집중하세요</div>`;
+    }
+    currentSplit = split || 'A';
+  }
+
+  function showSplit(split) {
+    currentSplit = split;
+    ['A', 'B', 'C'].forEach(s => {
+      const btn = document.getElementById('splitBtn-' + s);
+      if (s === split) {
+        btn.classList.add('active', 'text-white', 'border-blue-600');
+        btn.classList.remove('text-gray-400', 'border-gray-700');
+      } else {
+        btn.classList.remove('active', 'text-white', 'border-blue-600');
+        btn.classList.add('text-gray-400', 'border-gray-700');
+      }
+    });
+    renderRoutine();
+  }
+
+  function dateKey() {
+    const n = new Date();
+    return `${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()}`;
+  }
+  function storageKey() { return `muhu_routine_${dateKey()}_${currentSplit}`; }
+  function getChecked() { return JSON.parse(localStorage.getItem(storageKey()) || '{}'); }
+  function setChecked(name, val) {
+    const d = getChecked();
+    d[name] = val;
+    localStorage.setItem(storageKey(), JSON.stringify(d));
+  }
+
+  function renderRoutine() {
+    const r = ROUTINES[currentSplit];
+    const checked = getChecked();
+    const totalItems = r.groups.reduce((s, g) => s + g.items.length, 0);
+    const doneCount = Object.values(checked).filter(Boolean).length;
+    const pct = totalItems ? Math.round((doneCount / totalItems) * 100) : 0;
+
+    let html = `
+      <div class="flex items-center gap-3 mb-5 text-xs text-gray-400">
+        <span class="font-semibold">${doneCount} / ${totalItems} 완료 (${pct}%)</span>
+        <div class="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width:${pct}%"></div>
+        </div>
+        ${pct === 100 ? '<span class="text-green-400 font-bold">🎉 완료!</span>' : ''}
+      </div>`;
+
+    r.groups.forEach(group => {
+      html += `<div class="mb-5">
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">${group.name}</h3>
+        <div class="space-y-2">`;
+      group.items.forEach(item => {
+        const done = !!checked[item];
+        html += `
+          <label class="flex items-center gap-3 bg-gray-800 hover:bg-gray-750 rounded-xl px-4 py-3 cursor-pointer transition-colors">
+            <input type="checkbox" class="w-5 h-5 rounded accent-blue-500 cursor-pointer"
+                   ${done ? 'checked' : ''}
+                   onchange="toggleEx('${item.replace(/'/g,"\\'")}', this.checked)">
+            <span class="text-sm flex-1 ${done ? 'line-through text-gray-500' : 'text-white'}">${item}</span>
+            ${done ? '<span class="text-green-400 text-xs">✓</span>' : ''}
+          </label>`;
+      });
+      html += `</div></div>`;
+    });
+
+    document.getElementById('routineContent').innerHTML = html;
+  }
+
+  function toggleEx(name, val) {
+    setChecked(name, val);
+    renderRoutine();
+  }
+  function resetRoutine() {
+    if (!confirm('오늘 기록을 초기화할까요?')) return;
+    localStorage.removeItem(storageKey());
+    renderRoutine();
+  }
+
+  // ===================== 유틸 =====================
+  function copyCode(code, btn) {
+    navigator.clipboard.writeText(code).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ 복사됨';
+      btn.classList.add('bg-green-700');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('bg-green-700'); }, 1500);
+    });
+  }
+
+  // ===================== 초기화 =====================
+  initHeader();
+  renderCard(false);
+  initTodaySplit();
+  showSplit(currentSplit);
+  showTab('hub');
+  document.getElementById('cardNav').style.display = 'none';
+  </script>
+</body>
+</html>
